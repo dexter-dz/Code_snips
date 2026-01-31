@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Invoice Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f5f7;
+            --card-bg: #ffffff;
+            --text: #1d1d1f;
+            --text-muted: #6e6e73;
+            --accent: #0071e3;
+            --accent-hover: #0077ed;
+            --border: #d2d2d7;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin: 0 0 1.5rem 0;
+        }
+
+        .field-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.375rem;
+        }
+
+        input {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9375rem;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 100%;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background: #fafafa;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        th:last-child { text-align: right; }
+        th:nth-child(2), th:nth-child(3), th:nth-child(4) { text-align: right; }
+
+        td {
+            padding: 0.625rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        td:nth-child(2), td:nth-child(3), td:nth-child(4) {
+            text-align: right;
+        }
+
+        td input {
+            width: 100%;
+            min-width: 60px;
+            padding: 0.5rem;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .btn {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.05s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: #e8e8ed;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #d2d2d7;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .bill-output {
+            margin-top: 2rem;
+        }
+
+        .bill-output .card {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .bill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .bill-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        .bill-meta {
+            text-align: right;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .bill-items-table th {
+            background: #f5f5f7;
+        }
+
+        .bill-total-row {
+            font-weight: 700;
+            font-size: 1rem;
+            background: #fafafa !important;
+            border-top: 2px solid var(--border);
+        }
+
+        .bill-total-row td {
+            padding: 1rem;
+        }
+
+        .bill-footer {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>DZ Invoice Generator</h1>
+            <p class="subtitle">Enter your name and line items below.</p>
+
+            <div class="field-group">
+                <label for="billerName">Billed By</label>
+                <input type="text" id="billerName" placeholder="Your name">
+            </div>
+
+            <div class="field-group">
+                <label>Line Items</label>
+                <div class="table-wrapper">
+                    <table id="itemsTable">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" placeholder="Item name"></td>
+                                <td><input type="number" min="1" placeholder="0"></td>
+                                <td><input type="number" min="0" step="0.01" placeholder="0.00"></td>
+                                <td class="amount-cell">—</td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" placeholder="Item name"></td>
+                                <td><input type="number" min="1" placeholder="0"></td>
+                                <td><input type="number" min="0" step="0.01" placeholder="0.00"></td>
+                                <td class="amount-cell">—</td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" placeholder="Item name"></td>
+                                <td><input type="number" min="1" placeholder="0"></td>
+                                <td><input type="number" min="0" step="0.01" placeholder="0.00"></td>
+                                <td class="amount-cell">—</td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" placeholder="Item name"></td>
+                                <td><input type="number" min="1" placeholder="0"></td>
+                                <td><input type="number" min="0" step="0.01" placeholder="0.00"></td>
+                                <td class="amount-cell">—</td>
+                            </tr>
+                            <tr>
+                                <td><input type="text" placeholder="Item name"></td>
+                                <td><input type="number" min="1" placeholder="0"></td>
+                                <td><input type="number" min="0" step="0.01" placeholder="0.00"></td>
+                                <td class="amount-cell">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" id="generateBtn">Generate Bill</button>
+                <button class="btn btn-secondary" id="clearBtn">Clear</button>
+            </div>
+        </div>
+
+        <div class="bill-output card hidden" id="billOutput">
+            <div class="bill-header">
+                <div>
+                    <div class="bill-title">INVOICE BILL</div>
+                    <div style="font-size: 0.9rem; margin-top: 0.25rem;" id="billerDisplay"></div>
+                </div>
+                <div class="bill-meta" id="dateTimeDisplay"></div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="bill-items-table" id="billTable">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billBody"></tbody>
+                    <tfoot>
+                        <tr class="bill-total-row">
+                            <td colspan="3">TOTAL</td>
+                            <td id="totalDisplay">0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="bill-footer">
+                Bill prepared by: <strong id="billerFooter"></strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const billerNameInput = document.getElementById('billerName');
+        const itemsTable = document.getElementById('itemsTable');
+        const billOutput = document.getElementById('billOutput');
+        const billBody = document.getElementById('billBody');
+        const totalDisplay = document.getElementById('totalDisplay');
+        const billerDisplay = document.getElementById('billerDisplay');
+        const billerFooter = document.getElementById('billerFooter');
+        const dateTimeDisplay = document.getElementById('dateTimeDisplay');
+        const generateBtn = document.getElementById('generateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        function formatDate() {
+            const now = new Date();
+            const opts = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' };
+            return now.toLocaleDateString('en-US', opts);
+        }
+
+        function updateAmountCells() {
+            const rows = itemsTable.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const qty = parseFloat(row.querySelectorAll('input')[1]?.value) || 0;
+                const price = parseFloat(row.querySelectorAll('input')[2]?.value) || 0;
+                const amountCell = row.querySelector('.amount-cell');
+                if (amountCell) {
+                    amountCell.textContent = (qty && price) ? (qty * price).toFixed(2) : '—';
+                }
+            });
+        }
+
+        itemsTable.addEventListener('input', updateAmountCells);
+
+        generateBtn.addEventListener('click', () => {
+            const biller = billerNameInput.value.trim() || 'Unknown';
+            const rows = itemsTable.querySelectorAll('tbody tr');
+            const items = [];
+
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const name = inputs[0]?.value.trim();
+                const qty = parseFloat(inputs[1]?.value) || 0;
+                const price = parseFloat(inputs[2]?.value) || 0;
+
+                if (name && qty > 0 && price >= 0) {
+                    items.push({ name, qty, price, amount: qty * price });
+                }
+            });
+
+            if (items.length === 0) {
+                alert('Please enter at least one item with a valid quantity and price.');
+                return;
+            }
+
+            billBody.innerHTML = items.map(i => `
+                <tr>
+                    <td>${escapeHtml(i.name)}</td>
+                    <td style="text-align: right">${i.qty}</td>
+                    <td style="text-align: right">${i.price.toFixed(2)}</td>
+                    <td style="text-align: right">${i.amount.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            const total = items.reduce((sum, i) => sum + i.amount, 0);
+            totalDisplay.textContent = total.toFixed(2);
+            billerDisplay.textContent = biller;
+            billerFooter.textContent = biller;
+            dateTimeDisplay.textContent = formatDate();
+
+            billOutput.classList.remove('hidden');
+            billOutput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        clearBtn.addEventListener('click', () => {
+            billerNameInput.value = '';
+            itemsTable.querySelectorAll('tbody input').forEach(inp => inp.value = '');
+            itemsTable.querySelectorAll('.amount-cell').forEach(cell => cell.textContent = '—');
+            billOutput.classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
